@@ -2,7 +2,7 @@
 codice matlab per esame di matematica applicata LM anno 2022
 unibo - laurea LM elettronica e telecomunicazioni
 
-ASSIGNMENTS PROJECT EXAM <matematica applicata>
+ASSIGNMENTS PROJECT EXAM matematica applicata
   
 Given a set of processes i=1,…n each requiring time t(i) and memory m(i) and a "profit" equal to t*m and a processor having
 total memory M and an available computing slot of T units.
