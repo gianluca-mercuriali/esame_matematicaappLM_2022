@@ -1,6 +1,6 @@
 % main box sizes:
-a=2; % sarà T
-b=1; % sarà M
+a=1; % sarà T
+b=2; % sarà M
 % M>>T quindi contenitore più alto che largo 
 
 Nb=30; %Numero massimo di scatole che posso contenere
@@ -8,13 +8,13 @@ Nb=30; %Numero massimo di scatole che posso contenere
 %% funzione che mi genera la grandezza dei rettangoli
 % random boxes sizes:
 mab =mean([a b]);
-aa = 0.05*mab+0.3*mab*rand(1,Nb); %larghezza è una matrice
-bb=0.05*mab+0.3*mab*rand(1,Nb); %altezza
+time = 0.05*mab+0.3*mab*rand(1,Nb); %larghezza è una matrice
+memory = 0.05*mab+0.3*mab*rand(1,Nb); %altezza
 
 %% INIZIALIZZAZIONE
 
-m2 = min([aa bb]/2); % smallest half-size
-AA=aa.*bb; % boxes areas %PROFITTO
+m2 = min([time memory]/2); % smallest half-size
+Profit=time.*memory; % boxes areas %PROFITTO
 
 
 penalty = 0.1*a*b;
@@ -43,7 +43,7 @@ ha2=subplot(2,1,2);
 drawnow;
 %%
 
-%set_cl; % set color table cl to plot boxes with different colors %sticazzi
+set_cl; % set color table cl to plot boxes with different colors %sticazzi
 
 %%
 % random initial population:
@@ -96,14 +96,14 @@ for ngc=1:ng % generations counting
             y=G1(4,ind);
             
             if L==1
-                aaa=aa(ind); %riporta il vettore aa eliminando gli elementi nulli di vis 
-                bbb=bb(ind);
+                aaa=time(ind); %riporta il vettore aa eliminando gli elementi nulli di vis 
+                bbb=memory(ind);
                 if rot % se entra qua dentro, cambia larghezza con altezza
                     tmp=aaa; 
                     aaa=bbb;
                     bbb=tmp;
                 end
-                A0=AA(ind); % box area %crea le i-esime scatole
+                A0=Profit(ind); % box area %crea le i-esime scatole
                 x1=max([x-aaa/2  0]); 
                 y1=max([y-bbb/2  0]); % dimesioni max e min scatola corrente
                 x2=min([x+aaa/2  a]);
@@ -131,14 +131,14 @@ for ngc=1:ng % generations counting
                 % add boxes arreas and strong subtract out areas:
                 for n=1:L % for each box
                     ind1=ind(n);
-                    aaa=aa(ind1);
-                    bbb=bb(ind1);
+                    aaa=time(ind1);
+                    bbb=memory(ind1);
                     if rot(n) % se entra qua dentro, cambia larghezza con altezza
                         tmp=aaa;
                         aaa=bbb;
                         bbb=tmp;
                     end
-                    A0=AA(ind1); % box area
+                    A0=Profit(ind1); % box area
                     x1=max([x(n)-aaa/2  0]);
                     y1=max([y(n)-bbb/2  0]);
                     x2=min([x(n)+aaa/2  a]);
@@ -168,26 +168,26 @@ for ngc=1:ng % generations counting
                 % for each pair of boxes:
                 for n1=1:L-1
                     ind1=ind(n1);
-                    aaa1=aa(ind1);
-                    bbb1=bb(ind1);
+                    aaa1=time(ind1);
+                    bbb1=memory(ind1);
                     if rot(n1)
                         tmp=aaa1;
                         aaa1=bbb1;
                         bbb1=tmp;
                     end
-                    A1=AA(ind1);
+                    A1=Profit(ind1);
                     x1=x(n1);
                     y1=y(n1); % position of 1st box of pair
                     for n2=n1+1:L
                         ind2=ind(n2);
-                        aaa2=aa(ind2);
-                        bbb2=bb(ind2);
+                        aaa2=time(ind2);
+                        bbb2=memory(ind2);
                         if rot(n2)
                             tmp=aaa2;
                             aaa2=bbb2;
                             bbb2=tmp;
                         end
-                        A2=AA(ind2);
+                        A2=Profit(ind2);
                         x2=x(n2);
                         y2=y(n2); % position of 2nd box of pair
                         dx=abs(x1-x2);
@@ -227,8 +227,8 @@ for ngc=1:ng % generations counting
             vis1=G1(1,Nbc);
             if vis1
                 rot1=G1(2,Nbc);
-                aaa=aa(Nbc);
-                bbb=bb(Nbc);
+                aaa=time(Nbc);
+                bbb=memory(Nbc);
                 if rot1
                     tmp=aaa;
                     aaa=bbb;
@@ -411,14 +411,14 @@ for ngc=1:ng % generations counting
             rv=find((G1(1,:))&((1:Nb)~=Nc)); % find rest visible
             if rand<0.5
                 % to veritcile edge
-                eax=[G1(3,rv)-aa(rv)/2  G1(3,rv)+aa(rv)/2  0  a]; % edge xs
-                deax=[(G1(3,ir)-aa(ir)/2) - eax  (G1(3,ir)+aa(ir)/2) - eax]; % distancies
+                eax=[G1(3,rv)-time(rv)/2  G1(3,rv)+time(rv)/2  0  a]; % edge xs
+                deax=[(G1(3,ir)-time(ir)/2) - eax  (G1(3,ir)+time(ir)/2) - eax]; % distancies
                 [dmn indm]=min(abs(deax));
                 G1(3,ir)=G1(3,ir)-deax(indm);
             else
                 % to horizontal edge
-                eay=[G1(4,rv)-bb(rv)/2  G1(4,rv)+bb(rv)/2  0  b]; % edge ys
-                deay=[(G1(4,ir)-bb(ir)/2) - eay  (G1(4,ir)+bb(ir)/2) - eay]; % distancies
+                eay=[G1(4,rv)-memory(rv)/2  G1(4,rv)+memory(rv)/2  0  b]; % edge ys
+                deay=[(G1(4,ir)-memory(ir)/2) - eay  (G1(4,ir)+memory(ir)/2) - eay]; % distancies
                 [dmn indm]=min(abs(deay));
                 G1(4,ir)=G1(4,ir)-deay(indm);
             end
