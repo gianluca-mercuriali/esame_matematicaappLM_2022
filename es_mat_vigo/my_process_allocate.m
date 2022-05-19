@@ -2,30 +2,21 @@ clc
 clear all
 
 % main box sizes:
-a=2; % sarà T
-b=1; % sarà M
-% M>>T quindi contenitore più alto che largo 
+% fprintf('inserire il valore minimo possibile di M: ')  
+% imin = input(' ');
+% fprintf('inserire il valore massimo possibile di M: ')  
+% imax = input(' ');
+% 
+% [T,M] = rand_M_T(imin,imax); %function do a_mod_b
+% T
+% M
 
-Nb=10; %Numero massimo di scatole che posso contenere
-       %Nb è quante scatole genera
-%% funzione che mi genera la grandezza dei rettangoli
-% random boxes sizes:
-mab =mean([a b]);
-time = 0.05*mab+0.3*mab*rand(1,Nb); %larghezza è una matrice
-memory = 0.05*mab+0.3*mab*rand(1,Nb); %altezza
+T=2;
+M=2;
+Ngen=100; % number of generations
+Np=30; % numero di processi
 
-%% INIZIALIZZAZIONE
-
-m2 = min([time memory]/2); % smallest half-size
-Profit=time.*memory; % boxes areas %PROFITTO
-
-
-penalty = 0.1*a*b;
-nac=0.5; % negative area coefficient
-
-N=500;  % population size
-process=5000; % PROCESSI DA ALLOCARE %% numero volte che esegue l'algoritmo
-
+N=500; % population size
 pmpe=0.05; % places exchange mutation probability
 pmbj=0.01; % big gauss jump
 pmsj=0.02; % small gauss jump
@@ -33,40 +24,55 @@ pmrr=0.05; % random rotation
 pmvi=0.05; % random visible/invisible
 pmne=0.1; % move to nearest adge
 
-%% PLOT
+
+
+% random boxes sizes:
+mab=mean([T M]);
+% time=0.05*mab+0.3*mab*rand(1,Np);
+% memory=0.05*mab+0.3*mab*rand(1,Np);
+time=0.05*mab+0.1*mab*rand(1,Np);
+memory=0.05*mab+0.1*mab*rand(1,Np);
+
+m2=min([time memory]/2); % smallest half-size
+Profit=time.*memory; % boxes areas
+
+penalty=0.2*T*M;
+nac=0.8; % negative area coefficient
+
+
+
 figure;
 %ha1=axes;
 ha1=subplot(2,1,1);
-plot([0 a a 0 0], [0 0 b b 0],'b-');
-xlim([-0.1*a 1.1*a]);
-ylim([-0.1*b 1.1*b]);
+plot([0 T T 0 0], [0 0 M M 0],'M-');
+xlim([-0.1*T 1.1*T]);
+ylim([-0.1*M 1.1*M]);
 set(ha1,'NextPlot','add');
 ht=title(ha1,'start');
 ha2=subplot(2,1,2);
 drawnow;
-%%
 
-set_cl; % set color table cl to plot boxes with different colors %sticazzi
 
-%%
+set_cl; % set color table cl to plot boxes with different colors
+
+
+
 % random initial population:
-G=zeros(N,4*Nb); %matrice righe colonne
-Gch=zeros(N,4*Nb); % children
-
-%% come istanzia la prima soluzione
-for Nc=1:N % for each individual % N numero di generazioni di G1
-    G1=zeros(4,Nb); % one individual  %Nb è il numero di colonne
-    
+G=zeros(N,4*Np);
+Gch=zeros(N,4*Np); % children
+for Nc=1:N % for each individual
+    G1=zeros(4,Np); % one individual
     % G1(1,i)=1 if i-box is visible
     % G1(2,i)=1 if i-box is rotated at 90 degrees
     % G1(3,i) - x-coordinate of i-box center
     % G1(4,i) - y-coordinate of i-box center
 
-    G1(1,:)=double(rand(1,Nb)<0.2); %probabilità che escano 0 o 1 (<0.2)
-    G1(2,:)=double(rand(1,Nb)<0.5);
+    G1(1,:)=double(rand(1,Np)<0.2);
+    G1(2,:)=double(rand(1,Np)<0.5);
     
-    G1(3,:)=m2+(a-m2)*rand(1,Nb);
-    G1(4,:)=m2+(b-m2)*rand(1,Nb);
+    G1(3,:)=m2+(T-m2)*rand(1,Np);
+    G1(4,:)=m2+(M-m2)*rand(1,Np);
+    
     
     G(Nc,:)=(G1(:))'; % (G1(:))' converts matrix to row-vector
 end
@@ -76,57 +82,50 @@ drawnow;
 
 
 
-Gpr1=zeros(4,Nb);
-Gpr2=zeros(4,Nb); % two parents
-Gch1=zeros(4,Nb);
-Gch2=zeros(4,Nb); % two children
-%%
-
-
-for ngc=1:process % generations counting
-    % find fitnesses: %funzione obiettivo
+Gpr1=zeros(4,Np);
+Gpr2=zeros(4,Np); % two parents
+Gch1=zeros(4,Np);
+Gch2=zeros(4,Np); % two children
+for ngc=1:Ngen % generations counting
+    % find fitnesses:
     fitnesses=zeros(N,1);
     for Nc=1:N % for each individual
         G1(:)=(G(Nc,:))';
         vis=G1(1,:);
-        ind=find(vis); %ritorna gli indici del vettore "vis" ed è esso stesso un vettore
-        L=length(ind); % mi dice quanti sono gli indici 
-        
+        ind=find(vis);
+        L=length(ind);
         if L>0
-            %only visible:
-            rot=G1(2,ind); % rotazione 
+            % only visible:
+            rot=G1(2,ind);
             x=G1(3,ind);
             y=G1(4,ind);
-            
             if L==1
-                time_temp=time(ind); %riporta il vettore aa eliminando gli elementi nulli di vis 
-                mem_temp=memory(ind);
-                if rot % se entra qua dentro, cambia larghezza con altezza
-                    tmp=time_temp; 
-                    time_temp=mem_temp;
-                    mem_temp=tmp;
+                aaa=time(ind);
+                bbb=memory(ind);
+                if rot
+                    tmp=aaa;
+                    aaa=bbb;
+                    bbb=tmp;
                 end
-                A0=Profit(ind); % box area %crea le i-esime scatole
-                x1=max([x-time_temp/2  0]); 
-                y1=max([y-mem_temp/2  0]); % dimesioni max e min scatola corrente
-                x2=min([x+time_temp/2  a]);
-                y2=min([y+mem_temp/2  b]);
-           
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
+                A0=Profit(ind); % box area
+                x1=max([x-aaa/2  0]);
+                y1=max([y-bbb/2  0]);
+                x2=min([x+aaa/2  T]);
+                y2=min([y+bbb/2  M]);
                 % x1 - x2,  y1 - y2 is box (part of current box) that inside main box
                 if (x1>=x2)||(y1>=y2)
-                    A=0; % box that inside main box area %per forza 
+                    A=0; % box that inside main box area
                 else
                     A=(x2-x1)*(y2-y1); % box that inside main box area
                 end
                 %if A<A0 % if not fully inside main box
-                if (time_temp/2<=x)&&(x<=a-time_temp/2)&&(mem_temp/2<=y)&&(y<=b-mem_temp/2) % if filly inside
-                    fitness=A; %associa il valore ottimo corrente 
+                if (aaa/2<=x)&&(x<=T-aaa/2)&&(bbb/2<=y)&&(y<=M-bbb/2) % if filly inside
+                    fitness=A;
                 else
-                    fitness=A-nac*(A0-A)-penalty; %
+                    fitness=A-nac*(A0-A)-penalty;
                 end
                     
-            else %se L non è pari ad 1
+            else
                 fitness=0;
                 ispen=false; % true if penality
                 
@@ -134,18 +133,18 @@ for ngc=1:process % generations counting
                 % add boxes arreas and strong subtract out areas:
                 for n=1:L % for each box
                     ind1=ind(n);
-                    time_temp=time(ind1);
-                    mem_temp=memory(ind1);
-                    if rot(n) % se entra qua dentro, cambia larghezza con altezza
-                        tmp=time_temp;
-                        time_temp=mem_temp;
-                        mem_temp=tmp;
+                    aaa=time(ind1);
+                    bbb=memory(ind1);
+                    if rot(n)
+                        tmp=aaa;
+                        aaa=bbb;
+                        bbb=tmp;
                     end
                     A0=Profit(ind1); % box area
-                    x1=max([x(n)-time_temp/2  0]);
-                    y1=max([y(n)-mem_temp/2  0]);
-                    x2=min([x(n)+time_temp/2  a]);
-                    y2=min([y(n)+mem_temp/2  b]);
+                    x1=max([x(n)-aaa/2  0]);
+                    y1=max([y(n)-bbb/2  0]);
+                    x2=min([x(n)+aaa/2  T]);
+                    y2=min([y(n)+bbb/2  M]);
                     % x1 - x2,  y1 - y2 is box (part of current box) that inside main box
                     if (x1>=x2)||(y1>=y2)
                         A=0; % box that inside main box area
@@ -159,8 +158,8 @@ for ngc=1:process % generations counting
                         %fitness=fitness + A;
                     %end
                     
-                    if (time_temp/2<=x(n))&&(x(n)<=a-time_temp/2)&&(mem_temp/2<=y(n))&&(y(n)<=b-mem_temp/2) % if filly inside
-                        fitness=fitness + A; %aggiorno il valore ottimo corrente
+                    if (aaa/2<=x(n))&&(x(n)<=T-aaa/2)&&(bbb/2<=y(n))&&(y(n)<=M-bbb/2) % if filly inside
+                        fitness=fitness + A;
                     else
                         fitness=fitness + A-nac*(A0-A);
                         ispen=true; % penality
@@ -171,32 +170,32 @@ for ngc=1:process % generations counting
                 % for each pair of boxes:
                 for n1=1:L-1
                     ind1=ind(n1);
-                    time_temp1=time(ind1);
-                    mem_temp1=memory(ind1);
+                    aaa1=time(ind1);
+                    bbb1=memory(ind1);
                     if rot(n1)
-                        tmp=time_temp1;
-                        time_temp1=mem_temp1;
-                        mem_temp1=tmp;
+                        tmp=aaa1;
+                        aaa1=bbb1;
+                        bbb1=tmp;
                     end
                     A1=Profit(ind1);
                     x1=x(n1);
                     y1=y(n1); % position of 1st box of pair
                     for n2=n1+1:L
                         ind2=ind(n2);
-                        time_temp2=time(ind2);
-                        mem_temp2=memory(ind2);
+                        aaa2=time(ind2);
+                        bbb2=memory(ind2);
                         if rot(n2)
-                            tmp=time_temp2;
-                            time_temp2=mem_temp2;
-                            mem_temp2=tmp;
+                            tmp=aaa2;
+                            aaa2=bbb2;
+                            bbb2=tmp;
                         end
                         A2=Profit(ind2);
                         x2=x(n2);
                         y2=y(n2); % position of 2nd box of pair
                         dx=abs(x1-x2);
                         dy=abs(y1-y2); % distancies
-                        a12=(time_temp1/2+time_temp2/2);
-                        b12=(mem_temp1/2+mem_temp2/2);
+                        a12=(aaa1/2+aaa2/2);
+                        b12=(bbb1/2+bbb2/2);
                         if (dx<a12)&&(dy<b12) % if cross
                             ispen=true;
                             Ac=(a12-dx)*(b12-dy); % area of cross
@@ -226,30 +225,30 @@ for ngc=1:process % generations counting
     if mod(ngc,10)==0
         cla(ha1);
         Atmp=0;
-        for Nbc=1:Nb
+        for Nbc=1:Np
             vis1=G1(1,Nbc);
             if vis1
                 rot1=G1(2,Nbc);
-                time_temp=time(Nbc);
-                mem_temp=memory(Nbc);
+                aaa=time(Nbc);
+                bbb=memory(Nbc);
                 if rot1
-                    tmp=time_temp;
-                    time_temp=mem_temp;
-                    mem_temp=tmp;
+                    tmp=aaa;
+                    aaa=bbb;
+                    bbb=tmp;
                 end
                 x=G1(3,Nbc);
                 y=G1(4,Nbc);
-                plot([x-time_temp/2  x+time_temp/2  x+time_temp/2  x-time_temp/2  x-time_temp/2],...
-                     [y-mem_temp/2  y-mem_temp/2  y+mem_temp/2  y+mem_temp/2  y-mem_temp/2],...
+                plot([x-aaa/2  x+aaa/2  x+aaa/2  x-aaa/2  x-aaa/2],...
+                     [y-bbb/2  y-bbb/2  y+bbb/2  y+bbb/2  y-bbb/2],...
                      '-','color',cl(Nbc,:),...
                      'parent',ha1);
                 hold on;
-                Atmp=Atmp+time_temp*mem_temp;
+                Atmp=Atmp+aaa*bbb;
             end
         end
-        plot([0 a a 0 0], [0 0 b b 0],'b-','parent',ha1);
-        xlim(ha1,[-0.1*a 1.1*a]);
-        ylim(ha1,[-0.1*b 1.1*b]);
+        plot([0 T T 0 0], [0 0 M M 0],'M-','parent',ha1);
+        xlim(ha1,[-0.1*T 1.1*T]);
+        ylim(ha1,[-0.1*M 1.1*M]);
         
         set(hi,'Cdata',G);
         
@@ -281,7 +280,7 @@ for ngc=1:process % generations counting
         Gpr1(:)=pr1'; 
         Gpr2(:)=pr2';
         
-        for Nbc=1:Nb
+        for Nbc=1:Np
             
             % visibility:
             if rand<0.5
@@ -355,8 +354,8 @@ for ngc=1:process % generations counting
     for Nc=1:N % for each individual
         if rand<pmpe
             G1(:)=(G(Nc,:))';
-            ir1=ceil(Nb*rand);
-            ir2=ceil(Nb*rand);
+            ir1=ceil(Np*rand);
+            ir2=ceil(Np*rand);
             tmp1=G1(3:4,ir1);
             G1(3:4,ir1)=G1(3:4,ir2);
             G1(3:4,ir2)=tmp1;
@@ -368,9 +367,9 @@ for ngc=1:process % generations counting
     for Nc=1:N % for each individual
         if rand<pmbj
             G1(:)=(G(Nc,:))';
-            ir=ceil(Nb*rand);
-            G1(3:4,ir)=G1(3:4,ir)+[0.05*a*randn;
-                                   0.05*b*randn];
+            ir=ceil(Np*rand);
+            G1(3:4,ir)=G1(3:4,ir)+[0.05*T*randn;
+                                   0.05*M*randn];
             G(Nc,:)=(G1(:))';
         end
     end
@@ -379,9 +378,9 @@ for ngc=1:process % generations counting
     for Nc=1:N % for each individual
         if rand<pmsj
             G1(:)=(G(Nc,:))';
-            ir=ceil(Nb*rand);
-            G1(3:4,ir)=G1(3:4,ir)+[0.005*a*randn;
-                                   0.005*b*randn];
+            ir=ceil(Np*rand);
+            G1(3:4,ir)=G1(3:4,ir)+[0.005*T*randn;
+                                   0.005*M*randn];
             G(Nc,:)=(G1(:))';
         end
     end
@@ -390,7 +389,7 @@ for ngc=1:process % generations counting
     for Nc=1:N % for each individual
         if rand<pmrr
             G1(:)=(G(Nc,:))';
-            ir=ceil(Nb*rand);
+            ir=ceil(Np*rand);
             G1(2,ir)=double(rand<0.5);
             G(Nc,:)=(G1(:))';
         end
@@ -400,7 +399,7 @@ for ngc=1:process % generations counting
     for Nc=1:N % for each individual
         if rand<pmvi
             G1(:)=(G(Nc,:))';
-            ir=ceil(Nb*rand);
+            ir=ceil(Np*rand);
             G1(1,ir)=double(rand<0.5);
             G(Nc,:)=(G1(:))';
         end
@@ -410,17 +409,17 @@ for ngc=1:process % generations counting
     for Nc=1:N % for each individual
         if rand<pmne
             G1(:)=(G(Nc,:))';
-            ir=ceil(Nb*rand); % random small box
-            rv=find((G1(1,:))&((1:Nb)~=Nc)); % find rest visible
+            ir=ceil(Np*rand); % random small box
+            rv=find((G1(1,:))&((1:Np)~=Nc)); % find rest visible
             if rand<0.5
                 % to veritcile edge
-                eax=[G1(3,rv)-time(rv)/2  G1(3,rv)+time(rv)/2  0  a]; % edge xs
+                eax=[G1(3,rv)-time(rv)/2  G1(3,rv)+time(rv)/2  0  T]; % edge xs
                 deax=[(G1(3,ir)-time(ir)/2) - eax  (G1(3,ir)+time(ir)/2) - eax]; % distancies
                 [dmn indm]=min(abs(deax));
                 G1(3,ir)=G1(3,ir)-deax(indm);
             else
                 % to horizontal edge
-                eay=[G1(4,rv)-memory(rv)/2  G1(4,rv)+memory(rv)/2  0  b]; % edge ys
+                eay=[G1(4,rv)-memory(rv)/2  G1(4,rv)+memory(rv)/2  0  M]; % edge ys
                 deay=[(G1(4,ir)-memory(ir)/2) - eay  (G1(4,ir)+memory(ir)/2) - eay]; % distancies
                 [dmn indm]=min(abs(deay));
                 G1(4,ir)=G1(4,ir)-deay(indm);
@@ -438,3 +437,4 @@ for ngc=1:process % generations counting
     
     
 end
+
