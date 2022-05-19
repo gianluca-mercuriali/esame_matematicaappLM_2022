@@ -1,6 +1,9 @@
+clc
+clear all
+
 % main box sizes:
-a=1; % sarà T
-b=2; % sarà M
+a=2; % sarà T
+b=1; % sarà M
 % M>>T quindi contenitore più alto che largo 
 
 Nb=30; %Numero massimo di scatole che posso contenere
@@ -20,8 +23,8 @@ Profit=time.*memory; % boxes areas %PROFITTO
 penalty = 0.1*a*b;
 nac=0.5; % negative area coefficient
 
-N=500;  % population size
-ng=100; % PROCESSI DA ALLOCARE
+N=1000;  % population size
+process=100; % PROCESSI DA ALLOCARE
 
 pmpe=0.05; % places exchange mutation probability
 pmbj=0.01; % big gauss jump
@@ -80,7 +83,7 @@ Gch2=zeros(4,Nb); % two children
 %%
 
 
-for ngc=1:ng % generations counting
+for ngc=1:process % generations counting
     % find fitnesses: %funzione obiettivo
     fitnesses=zeros(N,1);
     for Nc=1:N % for each individual
@@ -96,18 +99,18 @@ for ngc=1:ng % generations counting
             y=G1(4,ind);
             
             if L==1
-                aaa=time(ind); %riporta il vettore aa eliminando gli elementi nulli di vis 
-                bbb=memory(ind);
+                time_temp=time(ind); %riporta il vettore aa eliminando gli elementi nulli di vis 
+                mem_temp=memory(ind);
                 if rot % se entra qua dentro, cambia larghezza con altezza
-                    tmp=aaa; 
-                    aaa=bbb;
-                    bbb=tmp;
+                    tmp=time_temp; 
+                    time_temp=mem_temp;
+                    mem_temp=tmp;
                 end
                 A0=Profit(ind); % box area %crea le i-esime scatole
-                x1=max([x-aaa/2  0]); 
-                y1=max([y-bbb/2  0]); % dimesioni max e min scatola corrente
-                x2=min([x+aaa/2  a]);
-                y2=min([y+bbb/2  b]);
+                x1=max([x-time_temp/2  0]); 
+                y1=max([y-mem_temp/2  0]); % dimesioni max e min scatola corrente
+                x2=min([x+time_temp/2  a]);
+                y2=min([y+mem_temp/2  b]);
            
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
                 % x1 - x2,  y1 - y2 is box (part of current box) that inside main box
@@ -117,13 +120,13 @@ for ngc=1:ng % generations counting
                     A=(x2-x1)*(y2-y1); % box that inside main box area
                 end
                 %if A<A0 % if not fully inside main box
-                if (aaa/2<=x)&&(x<=a-aaa/2)&&(bbb/2<=y)&&(y<=b-bbb/2) % if filly inside
-                    fitness=A;
+                if (time_temp/2<=x)&&(x<=a-time_temp/2)&&(mem_temp/2<=y)&&(y<=b-mem_temp/2) % if filly inside
+                    fitness=A; %associa il valore ottimo corrente 
                 else
-                    fitness=A-nac*(A0-A)-penalty;
+                    fitness=A-nac*(A0-A)-penalty; %
                 end
                     
-            else
+            else %se L non è pari ad 1
                 fitness=0;
                 ispen=false; % true if penality
                 
@@ -131,18 +134,18 @@ for ngc=1:ng % generations counting
                 % add boxes arreas and strong subtract out areas:
                 for n=1:L % for each box
                     ind1=ind(n);
-                    aaa=time(ind1);
-                    bbb=memory(ind1);
+                    time_temp=time(ind1);
+                    mem_temp=memory(ind1);
                     if rot(n) % se entra qua dentro, cambia larghezza con altezza
-                        tmp=aaa;
-                        aaa=bbb;
-                        bbb=tmp;
+                        tmp=time_temp;
+                        time_temp=mem_temp;
+                        mem_temp=tmp;
                     end
                     A0=Profit(ind1); % box area
-                    x1=max([x(n)-aaa/2  0]);
-                    y1=max([y(n)-bbb/2  0]);
-                    x2=min([x(n)+aaa/2  a]);
-                    y2=min([y(n)+bbb/2  b]);
+                    x1=max([x(n)-time_temp/2  0]);
+                    y1=max([y(n)-mem_temp/2  0]);
+                    x2=min([x(n)+time_temp/2  a]);
+                    y2=min([y(n)+mem_temp/2  b]);
                     % x1 - x2,  y1 - y2 is box (part of current box) that inside main box
                     if (x1>=x2)||(y1>=y2)
                         A=0; % box that inside main box area
@@ -156,8 +159,8 @@ for ngc=1:ng % generations counting
                         %fitness=fitness + A;
                     %end
                     
-                    if (aaa/2<=x(n))&&(x(n)<=a-aaa/2)&&(bbb/2<=y(n))&&(y(n)<=b-bbb/2) % if filly inside
-                        fitness=fitness + A;
+                    if (time_temp/2<=x(n))&&(x(n)<=a-time_temp/2)&&(mem_temp/2<=y(n))&&(y(n)<=b-mem_temp/2) % if filly inside
+                        fitness=fitness + A; %aggiorno il valore ottimo corrente
                     else
                         fitness=fitness + A-nac*(A0-A);
                         ispen=true; % penality
@@ -168,32 +171,32 @@ for ngc=1:ng % generations counting
                 % for each pair of boxes:
                 for n1=1:L-1
                     ind1=ind(n1);
-                    aaa1=time(ind1);
-                    bbb1=memory(ind1);
+                    time_temp1=time(ind1);
+                    mem_temp1=memory(ind1);
                     if rot(n1)
-                        tmp=aaa1;
-                        aaa1=bbb1;
-                        bbb1=tmp;
+                        tmp=time_temp1;
+                        time_temp1=mem_temp1;
+                        mem_temp1=tmp;
                     end
                     A1=Profit(ind1);
                     x1=x(n1);
                     y1=y(n1); % position of 1st box of pair
                     for n2=n1+1:L
                         ind2=ind(n2);
-                        aaa2=time(ind2);
-                        bbb2=memory(ind2);
+                        time_temp2=time(ind2);
+                        mem_temp2=memory(ind2);
                         if rot(n2)
-                            tmp=aaa2;
-                            aaa2=bbb2;
-                            bbb2=tmp;
+                            tmp=time_temp2;
+                            time_temp2=mem_temp2;
+                            mem_temp2=tmp;
                         end
                         A2=Profit(ind2);
                         x2=x(n2);
                         y2=y(n2); % position of 2nd box of pair
                         dx=abs(x1-x2);
                         dy=abs(y1-y2); % distancies
-                        a12=(aaa1/2+aaa2/2);
-                        b12=(bbb1/2+bbb2/2);
+                        a12=(time_temp1/2+time_temp2/2);
+                        b12=(mem_temp1/2+mem_temp2/2);
                         if (dx<a12)&&(dy<b12) % if cross
                             ispen=true;
                             Ac=(a12-dx)*(b12-dy); % area of cross
@@ -227,21 +230,21 @@ for ngc=1:ng % generations counting
             vis1=G1(1,Nbc);
             if vis1
                 rot1=G1(2,Nbc);
-                aaa=time(Nbc);
-                bbb=memory(Nbc);
+                time_temp=time(Nbc);
+                mem_temp=memory(Nbc);
                 if rot1
-                    tmp=aaa;
-                    aaa=bbb;
-                    bbb=tmp;
+                    tmp=time_temp;
+                    time_temp=mem_temp;
+                    mem_temp=tmp;
                 end
                 x=G1(3,Nbc);
                 y=G1(4,Nbc);
-                plot([x-aaa/2  x+aaa/2  x+aaa/2  x-aaa/2  x-aaa/2],...
-                     [y-bbb/2  y-bbb/2  y+bbb/2  y+bbb/2  y-bbb/2],...
+                plot([x-time_temp/2  x+time_temp/2  x+time_temp/2  x-time_temp/2  x-time_temp/2],...
+                     [y-mem_temp/2  y-mem_temp/2  y+mem_temp/2  y+mem_temp/2  y-mem_temp/2],...
                      '-','color',cl(Nbc,:),...
                      'parent',ha1);
                 hold on;
-                Atmp=Atmp+aaa*bbb;
+                Atmp=Atmp+time_temp*mem_temp;
             end
         end
         plot([0 a a 0 0], [0 0 b b 0],'b-','parent',ha1);
@@ -435,4 +438,3 @@ for ngc=1:ng % generations counting
     
     
 end
-
