@@ -24,7 +24,7 @@ penalty = 0.1*a*b;
 nac=0.5; % negative area coefficient
 
 N=500;  % population size
-process=5000; % PROCESSI DA ALLOCARE %% numero volte che esegue l'algoritmo
+process=1000; % PROCESSI DA ALLOCARE %% numero volte che esegue l'algoritmo
 
 pmpe=0.05; % places exchange mutation probability
 pmbj=0.01; % big gauss jump
@@ -115,20 +115,20 @@ for ngc=1:process % generations counting
             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%    
                 % x1 - x2,  y1 - y2 is box (part of current box) that inside main box
                 if (x1>=x2)||(y1>=y2)
-                    A=0; % box that inside main box area %per forza 
+                    A=0; % box that inside main box area %per forza fuori 
                 else
                     A=(x2-x1)*(y2-y1); % box that inside main box area
                 end
                 %if A<A0 % if not fully inside main box
                 if (time_temp/2<=x)&&(x<=a-time_temp/2)&&(mem_temp/2<=y)&&(y<=b-mem_temp/2) % if filly inside
-                    fitness=A; %associa il valore ottimo corrente 
+                    fitness=A; %associa il valore ottimo corrente, soluzione corrente
                 else
-                    fitness=A-nac*(A0-A)-penalty; %
+                    fitness=A-nac*(A0-A)-penalty; %potrebbe essere un greedy che applica perturbazioni
                 end
                     
             else %se L non è pari ad 1
                 fitness=0;
-                ispen=false; % true if penality
+                ispen=false; % true if penality %per correggere?? mette/toglie penalità
                 
                 % check cross with main box:
                 % add boxes arreas and strong subtract out areas:
@@ -179,7 +179,7 @@ for ngc=1:process % generations counting
                         mem_temp1=tmp;
                     end
                     A1=Profit(ind1);
-                    x1=x(n1);
+                    x1=x(n1); %posiziona la scatola
                     y1=y(n1); % position of 1st box of pair
                     for n2=n1+1:L
                         ind2=ind(n2);
@@ -193,41 +193,42 @@ for ngc=1:process % generations counting
                         A2=Profit(ind2);
                         x2=x(n2);
                         y2=y(n2); % position of 2nd box of pair
-                        dx=abs(x1-x2);
+                        dx=abs(x1-x2);%modulo della distanza
                         dy=abs(y1-y2); % distancies
-                        a12=(time_temp1/2+time_temp2/2);
-                        b12=(mem_temp1/2+mem_temp2/2);
-                        if (dx<a12)&&(dy<b12) % if cross
+                        a12=(time_temp1/2+time_temp2/2); %somma la metà delle scatole 1 e 2
+                        b12=(mem_temp1/2+mem_temp2/2);   %somma la metà delle scatole 1 e 2
+                        if (dx<a12)&&(dy<b12) % if cross %attraversano/ si intersecano le scatole
                             ispen=true;
-                            Ac=(a12-dx)*(b12-dy); % area of cross
-                            fitness=fitness-Ac-Ac; % becuse area of n1 and n2 was added fully
-                            fitness=fitness-2*nac*Ac;
+                            Ac=(a12-dx)*(b12-dy); % area di intersezione
+                            fitness=fitness-Ac-Ac; % becuse area of n1 and n2 was added fully %la tolgo due volte perchè è sia in aaa che bbb, quindi riduco il valore delle scatole per farcele stare
+                            %fitness=fitness-2*nac*Ac; %box appiccicate  
                         end
 
                     end
                 end
                 
                 if ispen
-                    fitness=fitness-penalty;
+                    fitness=fitness-penalty; %correzione del valore 
                 end
         
             end
-        else
+        else % se L < 0 
             fitness=0;
         end
+  
         fitnesses(Nc)=fitness;
     end
     
-    [fb bi]=max(fitnesses); % best
+    [fb bi]=max(fitnesses); % mette dentro il valore ottimo
     
     % plot best:
-    G1(:)=(G(bi,:))';
+    G1(:)=(G(bi,:))'; %converte il vettore riga in una matrice %G è vettore riga e G1 è la matrice
     Gb=G(bi,:); % best
-    if mod(ngc,10)==0
-        cla(ha1);
+    if mod(ngc,10)== 0 %mod operatore modulo 
+        cla(ha1); %ha1 è il nome del plot
         Atmp=0;
         for Nbc=1:Nb
-            vis1=G1(1,Nbc);
+            vis1=G1(1,Nbc); % se G1 è visibile
             if vis1
                 rot1=G1(2,Nbc);
                 time_temp=time(Nbc);
@@ -263,12 +264,12 @@ for ngc=1:process % generations counting
     
     % prepare for crossover, selection:
     fmn=min(fitnesses);
-    fst=std(fitnesses);
+    fst=std(fitnesses); %std deviazione standard, guarda quanto sono diversi tra loro i valori della fitnesses
     if fst<1e-7
         fst=1e-7;
     end
     fmn1=fmn-0.01*fst; % little low then minimum
-    P=fitnesses-fmn1; % positive values
+    P=fitnesses-fmn1; % positive values %può togliere a tutti i valori di fitnesses fmn1
     p=P/sum(P); % probabilities
     ii=roulette_wheel_indexes(N,p);
     Gp=G(ii,:); % parents
