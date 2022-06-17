@@ -22,8 +22,8 @@ penalty=0.2*a*b;
 nac=0.8; % negative area coefficient
 
 
-N=5000; % population size
-ng=20000; % number of generations
+N=500; % population size
+ng=2000; % number of generations
 pmpe=0.1; % places exchange mutation probability
 pmbj=0.02; % big gauss jump
 pmsj=0.04; % small gauss jump

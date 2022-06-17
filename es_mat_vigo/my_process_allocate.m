@@ -11,10 +11,11 @@ clear all
 % T
 % M
 
-T=2;
-M=2;
-Ngen=100; % number of generations
-Np=30; % numero di processi
+T=2; %tempo (asse x)
+M=1; %memoria ( asse Y)
+
+Np=10; % numero di processi
+Ngen=1000; % number of generations
 
 N=500; % population size
 pmpe=0.05; % places exchange mutation probability
@@ -28,10 +29,10 @@ pmne=0.1; % move to nearest adge
 
 % random boxes sizes:
 mab=mean([T M]);
-% time=0.05*mab+0.3*mab*rand(1,Np);
-% memory=0.05*mab+0.3*mab*rand(1,Np);
-time=0.05*mab+0.1*mab*rand(1,Np);
-memory=0.05*mab+0.1*mab*rand(1,Np);
+time=0.05*mab+0.3*mab*rand(1,Np);
+memory=0.05*mab+0.3*mab*rand(1,Np);
+% time=0.05*mab+0.1*mab*rand(1,Np);
+% memory=0.05*mab+0.1*mab*rand(1,Np);
 
 m2=min([time memory]/2); % smallest half-size
 Profit=time.*memory; % boxes areas

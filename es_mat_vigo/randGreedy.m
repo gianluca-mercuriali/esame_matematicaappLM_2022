@@ -1,5 +1,5 @@
  
-function [a,b,tx] = randGreedy(time,Profit )
+function [a,b,tx] = randGreedy(time,Profit,Np,T )
 %% rand_T_M è una funzione che mi genera M e T casuale    
 % Original Author: Mercuriali Gianluca mt.1056381
 % Date and version 31/03/2022

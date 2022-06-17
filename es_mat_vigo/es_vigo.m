@@ -2,8 +2,8 @@ clc
 clear all
 
 % main box sizes:
-a=2; % sarà T
-b=1; % sarà M
+a=4; % sarà T
+b=2; % sarà M
 % M>>T quindi contenitore più alto che largo 
 
 Nb=10; %Numero massimo di scatole che posso contenere
@@ -271,6 +271,7 @@ for ngc=1:process % generations counting
     fmn1=fmn-0.01*fst; % little low then minimum
     P=fitnesses-fmn1; % positive values %può togliere a tutti i valori di fitnesses fmn1
     p=P/sum(P); % probabilities
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     ii=roulette_wheel_indexes(N,p);
     Gp=G(ii,:); % parents
     
