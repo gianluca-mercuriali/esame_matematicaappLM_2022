@@ -3,7 +3,7 @@ clear all
 
 T = 10; %tempo (asse x)
 M = 20; %memoria (asse Y)
-Np=20; % numero di processi
+Np=40; % numero di processi
 
 time = randi([1 5],1,Np) %vettore dei tempi
 memory = randi([1 5],1,Np) %vettore delle memorie
@@ -85,46 +85,50 @@ Profitto_totale;
 scarto_t=temp_t
 scarto_m=temp_m
 Profit_scarto = scarto_t .* scarto_m
+Profit_sol = matrix_t .* matrix_m
 
 matrix_t
 matrix_m
 
-%% LOCAL SEARCH
+%% LOCAL SEARCH first improvement 
 
-
-Profit_sol = matrix_t .* matrix_m
-temp_matrix_t = matrix_t;
-temp_matrix_m = matrix_m;
-temp_scarto_t = scarto_t; 
-temp_scarto_m = scarto_m;
+matrix_t_ls = matrix_t;
+matrix_m_ls = matrix_m;
+scarto_t_ls=scarto_t;
+scarto_m_ls=scarto_m;
+temp_matrix_t_ls = matrix_t_ls;
+temp_matrix_m_ls = matrix_m_ls;
+temp_scarto_t_ls = scarto_t_ls; 
+temp_scarto_m_ls = scarto_m_ls;
+Profit_scarto_ls=Profit_scarto;
 
 for d = 4: -1 : 1 %d-esima riga
     for j = 1:Np %j-esima colonna
         
         
-        for k = 1: length(scarto_t)
+        for k = 1: length(scarto_t_ls)
             
-            if ( Profit_sol(d,j) < Profit_scarto(k))
+            if ( Profit_sol(d,j) < Profit_scarto_ls(k))
                 
-                temp_matrix_t(d,j) = scarto_t(k);
-                temp_matrix_m(d,j) = scarto_m(k);
-                temp_scarto_t(k) = matrix_t(d,j);
-                temp_scarto_m(k) = matrix_m(d,j);
+                temp_matrix_t_ls(d,j) = scarto_t_ls(k);
+                temp_matrix_m_ls(d,j) = scarto_m_ls(k);
+                temp_scarto_t_ls(k) = matrix_t_ls(d,j);
+                temp_scarto_m_ls(k) = matrix_m_ls(d,j);
                 
-                if ( sum(temp_matrix_t(d,:)) > 10 )
+                if ( sum(temp_matrix_t_ls(d,:)) > 10 )
                     
-                    temp_scarto_t(k)= scarto_t(k);
-                    temp_scarto_m(k)= scarto_m(k);
-                    temp_matrix_t(d,j) = matrix_t(d,j);
-                    temp_matrix_m(d,j) = matrix_m(d,j);
+                    temp_scarto_t_ls(k)= scarto_t_ls(k);
+                    temp_scarto_m_ls(k)= scarto_m_ls(k);
+                    temp_matrix_t_ls(d,j) = matrix_t_ls(d,j);
+                    temp_matrix_m_ls(d,j) = matrix_m_ls(d,j);
                     
                 else
                     
-                    scarto_t(k)= temp_scarto_t(k);
-                    scarto_m(k)= temp_scarto_m(k);
-                    matrix_t(d,j)=temp_matrix_t(d,j);
-                    matrix_m(d,j)=temp_matrix_m(d,j);
-                    Profit_scarto = scarto_t .* scarto_m;
+                    scarto_t_ls(k)= temp_scarto_t_ls(k);
+                    scarto_m_ls(k)= temp_scarto_m_ls(k);
+                    matrix_t_ls(d,j)=temp_matrix_t_ls(d,j);
+                    matrix_m_ls(d,j)=temp_matrix_m_ls(d,j);
+                    Profit_scarto_ls = scarto_t_ls .* scarto_m_ls;
                     break
                 end
                 
@@ -135,9 +139,64 @@ for d = 4: -1 : 1 %d-esima riga
 end
 
 
-matrix_t
-matrix_m
-Profit_localsearch=matrix_t.*matrix_m
+matrix_t_ls;
+matrix_m_ls;
+Profit_ls = matrix_t_ls.*matrix_m_ls
+
+%% LOCAL SEARCH best improvement
 
 
+matrix_t_bi = matrix_t;
+matrix_m_bi = matrix_m;
+scarto_t_bi=scarto_t;
+scarto_m_bi=scarto_m;
+temp_matrix_t_bi = matrix_t_bi;
+temp_matrix_m_bi = matrix_m_bi;
+temp_scarto_t_bi = scarto_t_bi; 
+temp_scarto_m_bi = scarto_m_bi;
+Profit_scarto_bi=Profit_scarto;
+
+for d = 4: -1 : 1 %d-esima riga
+    for j = 1:Np %j-esima colonna
+        
+        
+        for k = 1: length(scarto_t_bi)
+            
+            if ( Profit_sol(d,j) < Profit_scarto_bi(k))
+                
+                temp_matrix_t_bi(d,j) = scarto_t_bi(k);
+                temp_matrix_m_bi(d,j) = scarto_m_bi(k);
+                temp_scarto_t_bi(k) = matrix_t_bi(d,j);
+                temp_scarto_m_bi(k) = matrix_m_bi(d,j);
+                
+                if ( sum(temp_matrix_t_bi(d,:)) > 10 )
+                    
+                    temp_scarto_t_bi(k)= scarto_t_bi(k);
+                    temp_scarto_m_bi(k)= scarto_m_bi(k);
+                    temp_matrix_t_bi(d,j) = matrix_t_bi(d,j);
+                    temp_matrix_m_bi(d,j) = matrix_m_bi(d,j);
+                    
+                else
+                    
+                    scarto_t_bi(k)= temp_scarto_t_bi(k);
+                    scarto_m_bi(k)= temp_scarto_m_bi(k);
+                    matrix_t_bi(d,j)=temp_matrix_t_bi(d,j);
+                    matrix_m_bi(d,j)=temp_matrix_m_bi(d,j);
+                    Profit_scarto_bi = scarto_t_bi .* scarto_m_bi;
+                   
+                end
+                
+            end
+            
+        end
+    end
+end
+
+
+matrix_t_bi;
+matrix_m_bi;
+Profit_bi = matrix_t_bi.*matrix_m_bi
+
+
+%% GRASP
 
