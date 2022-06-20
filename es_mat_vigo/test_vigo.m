@@ -10,53 +10,27 @@ memory=rand(1,Np);
 
 Profit=time.*memory; % boxes areas
 
-% tx=0; %sommatoria 
-% temp_t = time; %vettore temporaneo di time
-% temp_p = Profit;
-% 
-% a = zeros(1, Np); %vettore zeri, che conterrà i processi allocati casualmente
-% b = zeros (1, Np); % vettore zeri che conterrà il profitto greedy
-% k=1;
-% 
-% 
-% % %greedy brutale --> prendiamo elmenti del set dei processi e li mettiamo
-% dentro in modo casuale 
-% 
-% while  1
-%         
-%     i = randi([1,length(temp_t)],1);
-%     
-%     if( tx + temp_t(i) > T)
-%         break
-%     else
-%         
-%     tx= tx + temp_t(i);
-%     a(k) = temp_t(i);
-%     b(k) = temp_p(i);
-%     
-%     temp_t(i)=[];
-%     temp_p(i) =[];
-%     
-%     k=k+1;  
-%     end
-%     
-%     if (length(temp_t)==0) %
-%         break
-%     end
-%     
-% end
-% 
-% Profit;
 
-[a,b,tx] = randGreedy(time,Profit,Np,T);
+%% greedy brutale --> prendiamo elmenti del set dei processi e li mettiamo
+
+[a,Profit_greedy,mx] = randGreedy(memory,Profit,Np,T);
 SumProfit=sum(Profit); %profitto max
-Profit_greedy = b;
 SumProfitGreedy = sum(Profit_greedy); %sommatoria profitto
-tx;  %per stampare tx (ok)
+mx;  %per stampare mx (ok)
 a; %come li mette sulla x %per stampare a(ok)
 
 
 %% Algoritmo greedy max, che mi cerca le scatole massime e le mette dentro, tenendo fuori quelle più piccole
+
+
+%  [a,b,mx] = MaxGreedy(time,Profit,Np,T )
+% 
+% mx
+% a
+% Profit_MaxGreedy = b;
+% SumProfitMaxGreedy = sum(Profit_MaxGreedy); %sommatoria profitto
+
+%% local search
 
 
 

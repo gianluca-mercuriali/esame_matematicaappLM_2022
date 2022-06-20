@@ -1,11 +1,10 @@
  
-function [a,b,tx] = randGreedy(time,Profit,Np,T )
-%% rand_T_M è una funzione che mi genera M e T casuale    
+function [a,Profit_greedy,mx] = randGreedy(memory,Profit,Np,T )
+%% greedy brutale --> prendiamo elmenti del set dei processi e li mettiamo    
 % Original Author: Mercuriali Gianluca mt.1056381
-% Date and version 31/03/2022
 
-tx=0;
-temp_t = time; %vettore temporaneo di time
+mx=0;
+temp_m = memory; %vettore temporaneo di memory
 temp_p = Profit;
 
 a = zeros(1, Np); %vettore zeri, che conterrà i processi allocati casualmente
@@ -15,28 +14,28 @@ k=1;
 
 while  1
         
-    i = randi([1,length(temp_t)],1);
+    i = randi([1,length(temp_m)],1);
     
-    if( tx + temp_t(i) > T)
+    if( mx + temp_m(i) > T)
         break
     else
         
-    tx= tx + temp_t(i);
-    a(k) = temp_t(i);
+    mx= mx + temp_m(i);
+    a(k) = temp_m(i);
     b(k) = temp_p(i);
     
-    temp_t(i)=[];
+    temp_m(i)=[];
     temp_p(i) =[];
     
     k=k+1;  
     end
     
-    if (length(temp_t)==0) %
+    if (length(temp_m)==0) %
         break
     end
     
 end
 
-
+Profit_greedy = b;
 return 
 
