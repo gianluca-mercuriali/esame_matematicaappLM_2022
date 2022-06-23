@@ -1,14 +1,14 @@
 clc
 clear all
 
-T = 10; %tempo (asse x)
+T = 15; %tempo (asse x)
 M = 100; %memoria (asse Y)
-Np = 14; % numero di processi
+Np = 22; % numero di processi
 
-% time = randi([1 5],1,Np) %vettore dei tempi
-% memory = randi([1 5],1,Np) %vettore delle memorie
-time= [5,4,5,3,5,3,1,1,2,1,5,5,5,4]
-memory=[5,5,3,4,2,2,4,3,3,2,5,5,5,4]
+time = randi([1 5],1,Np) %vettore dei tempi
+memory = randi([1 5],1,Np) %vettore delle memorie
+% time= [5,4,5,3,5,3,1,1,2,1,5,5,5,4,2,3,4,1,2,3,4,2]
+% memory=[5,5,3,4,2,2,4,3,3,2,5,5,5,4,2,4,3,5,2,3,4,5]
 Profitto_totale = 0;
 Profit = time.*memory; %profitto dato da tutti i porcessi generati
 
@@ -37,12 +37,12 @@ Profit_greedy= matrix_t.*matrix_m;
 
 [matrix_t_ls,matrix_m_ls] = localSearch_fi(matrix_t,matrix_m,scarto_t,scarto_m,Profit_scarto,Np,Profit_greedy,T,M);
 
-matrix_t
-matrix_m
+matrix_t;
+matrix_m;
 matrix_t_ls
 matrix_m_ls
 Profit_greedy;
-Profit_ls = matrix_t_ls.*matrix_m_ls;
+Profit_ls = matrix_t_ls.*matrix_m_ls
 
 
 %% LOCAL SEARCH best improvement
@@ -108,8 +108,15 @@ Profit_ls = matrix_t_ls.*matrix_m_ls;
 %risultato euristica randomizzata
 [scarto_t_rand, scarto_m_rand, Profit_scarto_rand, matrix_t_rand, matrix_m_rand, Profit_randHeuristics] = randHeuristics(time,memory,Np,T,M )
 
-
 scarto_t_rand;
 scarto_m_rand;
 Profit_scarto_rand;
 Profit_randHeuristics;
+
+
+
+[matrix_t_grasp,matrix_m_grasp,Profit_grasp] = localSearch_grasp(matrix_t_rand,matrix_m_rand,scarto_t_rand,scarto_m_rand,Profit_scarto_rand,Np,Profit_randHeuristics,T,M);
+    
+matrix_t_grasp;
+matrix_m_grasp;
+Profit_grasp
