@@ -1,14 +1,13 @@
 clc
 clear all
 
-T = 15; %tempo (asse x)
-M = 100; %memoria (asse Y)
-Np = 22; % numero di processi
+T = 100; %tempo (asse x)
+M = 1000; %memoria (asse Y)
+Np = 100; % numero di processi
 
-time = randi([1 5],1,Np) %vettore dei tempi
-memory = randi([1 5],1,Np) %vettore delle memorie
-% time= [5,4,5,3,5,3,1,1,2,1,5,5,5,4,2,3,4,1,2,3,4,2]
-% memory=[5,5,3,4,2,2,4,3,3,2,5,5,5,4,2,4,3,5,2,3,4,5]
+time = randi([1 20],1,Np); %vettore dei tempi
+memory = randi([1 100],1,Np); %vettore delle memorie
+
 Profitto_totale = 0;
 Profit = time.*memory; %profitto dato da tutti i porcessi generati
 
@@ -20,10 +19,14 @@ Profit = time.*memory; %profitto dato da tutti i porcessi generati
 %riordino vettore time e memory in modo decrescente rispetto al profitto
 %per eseguire il greedy
 
+tic
 [matrix_t,matrix_m,Profitto_scaffale,scarto_t,scarto_m] = greedy(time,memory,Np,T,M );
 
+exe_time_greedy=toc %tempo di esecuzione per il greedy
+
+
 Profitto_totale;
-Profitto_scaffale
+Profitto_scaffale;
 scarto_t;
 scarto_m;
 Profit_scarto = scarto_t .* scarto_m;
@@ -31,19 +34,24 @@ Profit_scarto = scarto_t .* scarto_m;
 matrix_t;
 matrix_m;
 Profit_greedy= matrix_t.*matrix_m;
-
+profitto_greedy = sum(Profit_greedy,'all')
 
 %% LOCAL SEARCH first improvement
 
+tic
 [matrix_t_ls,matrix_m_ls] = localSearch_fi(matrix_t,matrix_m,scarto_t,scarto_m,Profit_scarto,Np,Profit_greedy,T,M);
+
+exe_time_ls=toc %tempo di esecuzione local search
+exe_time_gls = exe_time_ls + exe_time_greedy
 
 matrix_t;
 matrix_m;
-matrix_t_ls
-matrix_m_ls
 Profit_greedy;
-Profit_ls = matrix_t_ls.*matrix_m_ls
 
+matrix_t_ls;
+matrix_m_ls;
+Profit_ls = matrix_t_ls.*matrix_m_ls;
+profitto_ls = sum(Profit_ls,'all')
 
 %% LOCAL SEARCH best improvement
 %
@@ -103,20 +111,28 @@ Profit_ls = matrix_t_ls.*matrix_m_ls
 
 %% GRASP
 
-%  combinazione di un algoritmo di ricerca locale e di un’euristica randomizzata
+%  combinazione di un algoritmo di ricerca locale e di un’euristica randomizzat
+tic
+[scarto_t_rand, scarto_m_rand, Profit_scarto_rand, matrix_t_rand, matrix_m_rand, Profit_rand] = randHeuristics(time,memory,Np,T,M );
 
-%risultato euristica randomizzata
-[scarto_t_rand, scarto_m_rand, Profit_scarto_rand, matrix_t_rand, matrix_m_rand, Profit_randHeuristics] = randHeuristics(time,memory,Np,T,M )
-
-scarto_t_rand;
-scarto_m_rand;
-Profit_scarto_rand;
-Profit_randHeuristics;
+exe_time_rand=toc %tempo di esecuzione euristica randomizzata
 
 
+profitto_rand = sum(Profit_rand,'all')
 
-[matrix_t_grasp,matrix_m_grasp,Profit_grasp] = localSearch_grasp(matrix_t_rand,matrix_m_rand,scarto_t_rand,scarto_m_rand,Profit_scarto_rand,Np,Profit_randHeuristics,T,M);
-    
-matrix_t_grasp;
-matrix_m_grasp;
-Profit_grasp
+tic
+[matrix_t_g,matrix_m_g,Profit_grasp] = localSearch_grasp(matrix_t_rand,matrix_m_rand,scarto_t_rand,scarto_m_rand,Profit_scarto_rand,Np,Profit_rand,T,M);
+
+exe_time_grasp=toc %tempo esecuzione grasp    
+exe_time_graspTot = exe_time_grasp + exe_time_rand
+
+
+matrix_t_rand
+matrix_m_rand
+matrix_t_g;
+matrix_m_g;
+% scarto_t_g
+% scarto_m_g
+
+Profit_grasp; 
+profitto_grasp = sum(Profit_grasp,'all')
