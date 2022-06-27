@@ -1,4 +1,4 @@
-function [matrix_t_g,matrix_m_g,Profit_grasp,scarto_t_g,scarto_m_g] = localSearch_grasp(matrix_t_rand,matrix_m_rand,scarto_t_rand,scarto_m_rand,Profit_scarto_rand,Np,Profit_rand,T,M)
+function [matrix_t_g,matrix_m_g,Profit_grasp,scarto_t_g,scarto_m_g] = localSearch_grasp(matrix_t_rand,matrix_m_rand,scarto_t_rand,scarto_m_rand,Profit_scarto_rand,Np,Profit_rand,T,M,n_scaffali)
 
 matrix_t_g = matrix_t_rand;
 matrix_m_g = matrix_m_rand;
@@ -12,10 +12,10 @@ Profit_scarto_g = Profit_scarto_rand;
 Profit_grasp = Profit_rand;
 Profit_controllo = Profit_rand;
 
-tic
+
 
 for t = 1 : 100
-    for d = 4: -1 : 1 %ciclo che scorre le righe della matrice partendo dall'ultima
+    for d = n_scaffali: -1 : 1 %ciclo che scorre le righe della matrice partendo dall'ultima
         for j = 1:Np %ciclo che scorre le colonne della matrice
             for k = 1: length(scarto_t_g) %ciclo che scorre gli elementi del vettore scarto (elementi fuori dalla soluzione) 
 
@@ -26,7 +26,7 @@ for t = 1 : 100
                     temp_scarto_t_g(k) = matrix_t_g(d,j); %assegno al vettore temporaneo dello scarto dei tempi l'elemento in soluzione 
                     temp_scarto_m_g(k) = matrix_m_g(d,j); %assegno al vettore temporaneo dello scarto delle memorie l'elemento in soluzione 
 
-                    if (( sum(temp_matrix_t_g(d,:)) > T ) || (sum(temp_matrix_m_g(d,:)) > M/4)) %condizione che verifica che non vengano superati i valori massimi di memeoria e tempo di ciascun cassetto
+                    if (( sum(temp_matrix_t_g(d,:)) > T ) || (sum(temp_matrix_m_g(d,:)) > M/n_scaffali)) %condizione che verifica che non vengano superati i valori massimi di memeoria e tempo di ciascun cassetto
 
                         %se entra qui dentro significa che l'elemento inserito in modo provvisorio ha memoria o tempo troppo grande perciò si ritorna alla soluzione precedente                    
                         temp_scarto_t_g(k)= scarto_t_g(k);

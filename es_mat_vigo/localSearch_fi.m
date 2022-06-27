@@ -1,5 +1,5 @@
 
-function [matrix_t_ls,matrix_m_ls,scarto_t_ls,scarto_m_ls] = localSearch_fi(matrix_t,matrix_m,scarto_t,scarto_m,Profit_scarto,Np,Profit_greedy,T,M)
+function [matrix_t_ls,matrix_m_ls,scarto_t_ls,scarto_m_ls] = localSearch_fi(matrix_t,matrix_m,scarto_t,scarto_m,Profit_scarto,Np,Profit_greedy,T,M,n_scaffali)
 
 matrix_t_ls = matrix_t;
 matrix_m_ls = matrix_m;
@@ -11,9 +11,9 @@ temp_scarto_t_ls = scarto_t_ls;
 temp_scarto_m_ls = scarto_m_ls;
 Profit_scarto_ls=Profit_scarto;
 
-tic
 
-for d = 4: -1 : 1 %ciclo che scorre le righe della matrice partendo dall'ultima
+
+for d = n_scaffali: -1 : 1 %ciclo che scorre le righe della matrice partendo dall'ultima
     for j = 1:Np %ciclo che scorre le colonne della matrice
         for k = 1: length(scarto_t_ls) %ciclo che scorre gli elementi del vettore scarto (elementi fuori dalla soluzione) 
 
@@ -24,7 +24,7 @@ for d = 4: -1 : 1 %ciclo che scorre le righe della matrice partendo dall'ultima
                 temp_scarto_t_ls(k) = matrix_t_ls(d,j); %assegno al vettore temporaneo dello scarto dei tempi l'elemento in soluzione 
                 temp_scarto_m_ls(k) = matrix_m_ls(d,j); %assegno al vettore temporaneo dello scarto delle memorie l'elemento in soluzione 
 
-                if (( sum(temp_matrix_t_ls(d,:)) > T ) || (sum(temp_matrix_m_ls(d,:)) > M/4)) %condizione che verifica che non vengano superati i valori massimi di memeoria e tempo di ciascun cassetto
+                if (( sum(temp_matrix_t_ls(d,:)) > T ) || (sum(temp_matrix_m_ls(d,:)) > M/n_scaffali)) %condizione che verifica che non vengano superati i valori massimi di memeoria e tempo di ciascun cassetto
                    
                     %se entra qui dentro significa che l'elemento inserito in modo provvisorio ha memoria o tempo troppo grande perciò si ritorna alla soluzione precedente                    
                     temp_scarto_t_ls(k)= scarto_t_ls(k);
